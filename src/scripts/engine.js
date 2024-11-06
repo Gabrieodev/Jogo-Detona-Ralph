@@ -17,6 +17,7 @@ const state = {
     },
 };
 
+// Contagem do tempo
 function countDown(){
     state.values.currentTime--;
     state.view.timeLeft.textContent = state.values.currentTime;
@@ -28,24 +29,56 @@ function countDown(){
     }
 }
 
+// Inicia o áudio toda vez que o Ralph é acertado
 function playSound(audioName){
     let audio = new Audio(`./src/audios/${audioName}.m4a`);
     audio.volume = 0.2;
     audio.play();
 }
 
+// Faz com que Ralph apareça aleatoriamente nas janelas
 function randomSquare() {
     state.view.squares.forEach((square)=> {
-        square.classList.remove("enemy");
+        const ralph = square.querySelector('.enemy');
+        if (ralph) ralph.remove();
+
+        if (square.id === state.values.hitPosition) return;
     });
 
-    let randomNumber = Math.floor(Math.random()* 9);
+    let randomNumber = Math.floor(Math.random()* state.view.squares.length);
     let randomSquare = state.view.squares[randomNumber];
-    randomSquare.classList.add("enemy");
+    
+    let ralph = document.createElement('div');
+    ralph.classList.add('enemy');
+    randomSquare.appendChild(ralph);
     state.values.hitPosition = randomSquare.id;
-
 }
 
+// Não deixa Ralph aparecer duas vezes seguidas na mesma janela
+let lastPosition = null;
+
+function randomSquare() {
+    state.view.squares.forEach((square) => {
+        const ralph = square.querySelector('.enemy');
+        if (ralph) ralph.remove();
+    });
+
+    let randomNumber;
+    do {
+        randomNumber = Math.floor(Math.random() * state.view.squares.length);
+    } while (randomNumber === lastPosition);
+
+    lastPosition = randomNumber;
+
+    let randomSquare = state.view.squares[randomNumber];
+
+    let ralph = document.createElement('div');
+    ralph.classList.add('enemy');
+    randomSquare.appendChild(ralph);
+    state.values.hitPosition = randomSquare.id;
+}
+
+// Adiciona a interação entre Ralph e mouse
 function addListenerHitBox(){
     state.view.squares.forEach((square)=> {
         square.addEventListener("mousedown", () => {
