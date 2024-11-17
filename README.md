@@ -8,7 +8,7 @@ Nesse jogo, Ralph vai aparecer aleatoriamente em uma das várias janelas de um p
 
 ### 🎯 Como Jogar
 
-1. **Aguarde o Ralph aparecer**: Ralph aparecerá de forma aleatória nas janelas do prédio.
+1. **Aguarde o Ralph aparecer**: Ralph aparecerá de forma aleatória nas janelas do prédio, conforme o tempo passa mais rapido o Ralph fica.
 2. **Clique Rápido!**: Assim que você ver o Ralph, clique na janela para pontuar.
 3. **Pontue o Máximo Possível**: Tente acertar o Ralph o maior número de vezes que conseguir antes que o tempo acabe.
 
