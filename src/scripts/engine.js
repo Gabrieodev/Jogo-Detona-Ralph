@@ -17,14 +17,32 @@ const state = {
     },
 };
 
+// Aumenta a velocidade do jogo conforme vai passando o tempo
+state.values.speedIncreaseInterval = 10;
+state.values.minGameVelocity = 400;
+
+function increaseGameSpeed() {
+    if(state.values.gameVelocity > state.values.minGameVelocity) {
+        state.values.gameVelocity -= 100;
+        clearInterval(state.actions.timerId);
+        state.actions.timerId = setInterval(randomSquare, state.values.gameVelocity);
+    }
+}
+
 // Contagem do tempo
 function countDown(){
     state.values.currentTime--;
     state.view.timeLeft.textContent = state.values.currentTime;
 
+    if (state.values.currentTime % state.values.speedIncreaseInterval === 0) {
+        increaseGameSpeed();
+    }
+
     if(state.values.currentTime <= 0){
         clearInterval(state.actions.countDownTimerId);
         clearInterval(state.actions.timerId);
+        updateHighScore();
+        saveGameHistory();
         alert("Game Over! O seu resultado foi:" + state.values.result);
     }
 }
@@ -79,7 +97,7 @@ function randomSquare() {
 }
 
 // Adiciona a interação entre Ralph e mouse
-function addListenerHitBox(){
+function addListenerHitBox() {
     state.view.squares.forEach((square)=> {
         square.addEventListener("mousedown", () => {
             if(square.id === state.values.hitPosition){
@@ -92,8 +110,62 @@ function addListenerHitBox(){
     });
 }
 
+// Adiciona pontuação máxima
+function updateHighScore() {
+    let highScore = localStorage.getItem("highScore") || 0;
+    if(state.values.result > highScore) {
+        localStorage.setItem("highScore", state.values.result);
+        highScore = state.values.result;
+        alert("Novo Recorde! Pontuação Máxima: " + highScore);
+    }
+    document.querySelector("#high-score").textContent = highScore;
+}
+
+// Registra a pontuação máxima
+function saveGameHistory() {
+    let gameHistory = JSON.parse(localStorage.getItem("gameHistory")) || [];
+    gameHistory.push({
+        score: state.values.result,
+        date: new Date().toLocaleString(),
+    });
+    localStorage.setItem("gameHistory", JSON.stringify(gameHistory));
+}
+
+// Adiciona histórico de pontuações
+function showGameHistory() {
+    let gameHistory = JSON.parse(localStorage.getItem("gameHistory")) || [];
+    console.log("Histórico de Jogos:");
+    gameHistory.forEach((game, index) => {
+        console.log(`${index + 1}. Pontuação: ${game.score} - Data: ${game.date}`);
+    });
+}
+
+// Reinicia o game sem recarregar a página
+function restartGame() {
+        // Limpa os intervalos existentes
+    clearInterval(state.actions.timerId);
+    clearInterval(state.actions.countDownTimerId);
+
+    // Reinicia os valores do estado
+    state.values.gameVelocity = 1000;
+    state.values.hitPosition = 0;
+    state.values.result = 0;
+    state.values.currentTime = 60;
+
+    // Atualiza a interface do usuário
+    state.view.timeLeft.textContent = state.values.currentTime;
+    state.view.score.textContent = state.values.result;
+
+    // Reinicia os intervalos e a lógica do jogo
+    state.actions.timerId = setInterval(randomSquare, state.values.gameVelocity);
+    state.actions.countDownTimerId = setInterval(countDown, 1000);
+
+    console.log("Jogo reiniciado!");
+}
+    
 function initialize() {
     addListenerHitBox();
+    updateHighScore();
 }
 
 initialize();
